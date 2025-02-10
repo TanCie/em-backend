@@ -1,4 +1,5 @@
 import Event from "../models/event.model.js";
+import cloudinary from "../lib/cloudinary.js";
 
 export const createEvent = async (req, res) => {
   try {
@@ -8,9 +9,15 @@ export const createEvent = async (req, res) => {
       return res.status(400).json({ message: "Title, image, date, location, description, and category are required" });
     }
 
+    let imageUrl;
+    if (image) {
+      const uploadResponse = await cloudinary.uploader.upload(image);
+      imageUrl = uploadResponse.secure_url;
+    }
+
     const newEvent = new Event({
       title,
-      image,
+      image: imageUrl,
       date,
       location,
       description,
@@ -25,7 +32,6 @@ export const createEvent = async (req, res) => {
     res.status(500).json("Internal Server Error");
   }
 }
-
 
 export const getAllEvents = async (req, res) => {
   try {
@@ -60,9 +66,8 @@ export const getEventById = async (req, res) => {
 
 export const updateEvent = async (req, res) => {
   try {
-    const { id } = req.params; // Get the event ID from the URL parameters
-
-    const existingEvent = await Event.findById(id); // Check if the event exists
+    const { id } = req.params;
+    const existingEvent = await Event.findById(id);
     if (
       req.body.location !== existingEvent.location ||
       req.body.category !== existingEvent.category ||
@@ -79,7 +84,7 @@ export const updateEvent = async (req, res) => {
     if (!updatedEvent) {
       return res.status(404).json({ message: "Event not found" });
     }
-    res.json(updatedEvent); // Respond with the updated event
+    res.json(updatedEvent);
   } catch (error) {
     console.error("Error updating event:", error);
     res.status(500).json({ message: "Server Error" });
