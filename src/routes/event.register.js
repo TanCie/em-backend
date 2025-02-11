@@ -23,5 +23,27 @@ router.post("/:eventId", async (req, res) => {
   }
 });
 
+router.get("/myreg-events/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const events = await Event.find({ joinedUsers: userId });
+    res.json(events);
+  } catch (error) {
+    console.error("Error fetching registered events:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.get("/my-events/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const events = await Event.find({ createdBy: userId });
+    res.json(events);
+  } catch (error) {
+    console.error("Error fetching created events:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 
 export default router;
