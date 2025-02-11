@@ -1,6 +1,6 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
-import { generateToken } from "../lib/utils.js";
+import jwt from "jsonwebtoken";
 
 export const signup = async (req, res) => {
   const { username, email, password } = req.body;
@@ -26,7 +26,7 @@ export const signup = async (req, res) => {
     });
     if (newUser) {
       // Create a token
-      generateToken(newUser._id, res);
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
       await newUser.save();
 
       res.status(201).json({ message: "New user registered successfully" });
@@ -50,10 +50,16 @@ export const login = async (req, res) => {
     }
 
     // Create a token
-    generateToken(user._id, res);
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
-    res.status(200).json({ message: "Logged in successfully" });
+    console.log("user email: " + user);
+    console.log("user id: " + user._id);
 
+    res.json({
+      success: true,
+      token,
+      userId: user._id.toString(),
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Something went wrong in login" });

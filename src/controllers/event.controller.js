@@ -3,7 +3,7 @@ import cloudinary from "../lib/cloudinary.js";
 
 export const createEvent = async (req, res) => {
   try {
-    const { title, image, date, location, description, category } = req.body;
+    const { title, image, date, location, description, category, createdBy } = req.body;
 
     if (!title.trim() || !image || !date || !location.trim() || !description.trim() || !category.trim()) {
       return res.status(400).json({ message: "Title, image, date, location, description, and category are required" });
@@ -22,6 +22,7 @@ export const createEvent = async (req, res) => {
       location,
       description,
       category,
+      createdBy,
     });
 
     const savedEvent = await newEvent.save();
