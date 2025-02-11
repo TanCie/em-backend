@@ -3,16 +3,16 @@ import bcrypt from "bcryptjs";
 import { generateToken } from "../lib/utils.js";
 
 export const signup = async (req, res) => {
-  const { username, password } = req.body;
+  const { username, email, password } = req.body;
   try {
-    if (!username || !password) {
+    if (!username || !password || !email) {
       return res.status(400).json({ message: "All fields are required" });
     }
     if (username.length < 4 || password.length < 6) {
       return res.status(400).json({ message: "Username (min: 3 chars) and password (min: 6 chars)" });
     }
 
-    const user = await User.findOne({ username });
+    const user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ message: "User already exists" });
     }
@@ -21,6 +21,7 @@ export const signup = async (req, res) => {
 
     const newUser = new User({
       username,
+      email,
       password: hashedPassword,
     });
     if (newUser) {
@@ -37,9 +38,9 @@ export const signup = async (req, res) => {
 }
 
 export const login = async (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
   try {
-    const user = await User.findOne({ username });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "User does not exist" });
     }
