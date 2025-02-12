@@ -18,6 +18,6 @@ export const initializeSocket = (server) => {
 }
 export const notifyEvent = (eventId, updatedEvent) => {
   if (io) {
-    io.emit(`${eventId}:`, updatedEvent);
+    io.emit("eventUpdated", updatedEvent);
   }
 }
