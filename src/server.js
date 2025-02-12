@@ -15,7 +15,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
-    origin: ["http://localhost:5173", "https://eventrr.vercel.app/"],
+    origin: [process.env.FRONTEND_URL],
     credentials: true,
 }));
 app.use(express.json({ limit: "10mb", extended: true }));
