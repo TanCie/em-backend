@@ -37,7 +37,7 @@ export const createEvent = async (req, res) => {
 
 export const getAllEvents = async (req, res) => {
   try {
-    const events = await Event.find();
+    const events = await Event.find({});
     if (!events) res.status(404).json({ message: "No events found" });
     res.status(200).json(events);
   } catch (error) {
