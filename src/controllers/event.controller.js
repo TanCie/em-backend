@@ -1,5 +1,6 @@
 import Event from "../models/event.model.js";
 import cloudinary from "../lib/cloudinary.js";
+import { notifyEvent } from "../lib/socket.js";
 
 export const createEvent = async (req, res) => {
   try {
@@ -96,6 +97,8 @@ export const updateEvent = async (req, res) => {
       new: true,
       runValidators: true,
     });
+
+    notifyEvent(id, updatedEvent);
 
     res.json(updatedEvent);
   } catch (error) {
