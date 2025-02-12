@@ -68,26 +68,38 @@ export const getEventById = async (req, res) => {
 export const updateEvent = async (req, res) => {
   try {
     const { id } = req.params;
-    const existingEvent = await Event.findById(id);
-    if (
-      req.body.location !== existingEvent.location ||
-      req.body.category !== existingEvent.category ||
-      req.body.date !== existingEvent.date
-    ) {
-      return res.status(400).json({ message: "Location, category, and due date cannot be changed." });
-    }
+    const { userId, action } = req.body;
 
-    const updatedEvent = await Event.findByIdAndUpdate(
-      id,
-      req.body, // The data to update (from the request body)
-      { new: true, runValidators: true } // Options: return the updated doc, validate updates
-    );
-    if (!updatedEvent) {
+    const existingEvent = await Event.findById(id);
+    if (!existingEvent) {
       return res.status(404).json({ message: "Event not found" });
     }
+
+    let updateData = {};
+
+    if (action === "join") {
+      if (existingEvent.joinedUsers.includes(userId)) {
+        return res.status(400).json({ message: "User already joined this event" });
+      }
+      updateData = { $addToSet: { joinedUsers: userId }, $inc: { attendees: 1 } };
+    }
+
+    else if (action === "leave") {
+      if (!existingEvent.joinedUsers.includes(userId)) {
+        return res.status(400).json({ message: "User has not joined this event" });
+      }
+      updateData = { $pull: { joinedUsers: userId }, $inc: { attendees: -1 } };
+    }
+
+    // Update the event in the database
+    const updatedEvent = await Event.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    });
+
     res.json(updatedEvent);
   } catch (error) {
     console.error("Error updating event:", error);
     res.status(500).json({ message: "Server Error" });
   }
-}
+};
