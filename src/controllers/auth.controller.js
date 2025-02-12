@@ -26,10 +26,10 @@ export const signup = async (req, res) => {
     });
     if (newUser) {
       // Create a token
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
       await newUser.save();
 
-      res.status(201).json({ message: "New user registered successfully" });
+      res.status(201).json({ message: "New user registered successfully", token });
     }
   } catch (error) {
     console.log(error);

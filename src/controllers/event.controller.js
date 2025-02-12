@@ -66,6 +66,7 @@ export const getEventById = async (req, res) => {
   }
 }
 
+// updates attendees list
 export const updateEvent = async (req, res) => {
   try {
     const { id } = req.params;
@@ -106,3 +107,26 @@ export const updateEvent = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+
+// updates event form
+
+export const updateForm = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedFields = req.body;
+
+    const updatedEvent = await Event.findByIdAndUpdate(id, updatedFields, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updatedEvent) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    res.json(updatedEvent);
+  } catch (error) {
+    console.error("Error updating event:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+}
